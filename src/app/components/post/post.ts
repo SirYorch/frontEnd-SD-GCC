@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Solicitudes } from '../../solicitudes';
 
 @Component({
   selector: 'app-post',
@@ -11,11 +13,23 @@ import { Router } from '@angular/router';
 })
 export class Post {
   newPost = '';
+  
   submitPost() {
-    ///codigo aqui para enviar las nuevas posts
-    this.dash();
+    this.sistema.EnviarCorreo({ contenedor: this.newPost }).subscribe(
+      (response: any) => {
+        console.log('Post enviado exitosamente:', response);
+        this.newPost = ''; // Limpiar el campo de entrada después de enviar
+      },
+      (error: any) => {
+        // Manejar error si es necesario
+      },
+      () => {
+        this.dash();
+      }
+    );
+      
   }
-  constructor(private router: Router) {}
+  constructor(private router: Router,private sistema: Solicitudes) {}
   dash(){
     this.router.navigate(['/']);
   }

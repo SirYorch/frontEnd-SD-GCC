@@ -11,23 +11,15 @@ import { Solicitudes } from '../../solicitudes';
   styleUrl: './dashboard.scss'
 })
 export class Dashboard  implements OnInit {
-  posts = [
-    'Este es el primer post. ¡Hola mundo!',
-    'Acabo de terminar un proyecto en Angular 🚀',
-    '¿Qué opinan sobre el nuevo diseño de nuestra app?','Este es el primer post. ¡Hola mundo!',
-    'Acabo de terminar un proyecto en Angular 🚀',
-    '¿Qué opinan sobre el nuevo diseño de nuestra app?','Este es el primer post. ¡Hola mundo!',
-    'Acabo de terminar un proyecto en Angular 🚀',
-  ];
+   posts: { contenedor: string; id: number }[] = [];
 
   constructor(private router: Router, private servicio:Solicitudes) {}
   ngOnInit(): void {
     this.servicio.getSolicitudes().subscribe((data:any)=>{
-      console.log(data);
-      
-    })
+      this.posts = data;
+      console.log(this.posts);
+    }) 
   }
-
   crear(){
     this.router.navigate(['/Crear']);
   }

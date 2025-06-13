@@ -12,6 +12,9 @@ export class Solicitudes {
   private http = inject(HttpClient);
   
   getSolicitudes(){
-    return this.http.get('https://jsonplaceholder.typicode.com/posts/1');
+    return this.http.get('http://104.155.162.91:3000/api/posts');
+  }
+  EnviarCorreo(dato:any){
+    return this.http.post('http://104.155.162.91:3000/api/posts',dato)
   }
 }
