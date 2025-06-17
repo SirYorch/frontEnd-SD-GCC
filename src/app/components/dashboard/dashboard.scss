@@ -55,6 +55,19 @@ body {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(39, 65, 86, 0.2);
     transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.post p{
+    width: 100%;
+    text-align: left;
+}
+
+img{
+    max-width: 80%;
+    border-radius: 10px;
 }
 
 .post:hover {
