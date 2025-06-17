@@ -45,7 +45,7 @@ submitPost() {
         });
       },
       error: (error) => {
-        console.error('❌ Error al subir imagen:', error);
+        console.error(' Error al subir imagen:', error);
         alert('Error al subir la imagen');
       }
     });
@@ -53,7 +53,7 @@ submitPost() {
     // Si no hay imagen, solo envía el texto
     this.sistema.EnviarCorreo({ contenedor: this.newPost }).subscribe({
       next: (respuestaPost) => {
-        console.log('✅ Post sin imagen enviado:', respuestaPost);
+        console.log(' Post sin imagen enviado:', respuestaPost);
         this.socket.send(this.newPost);
         this.newPost = '';
       },
@@ -66,7 +66,7 @@ submitPost() {
   constructor(private router: Router,private sistema: Solicitudes) {}
   ngOnInit(): void {
     // 1. Conectar al WebSocket
-    this.socket = new WebSocket('http://34.46.243.239:8080/ws');
+    this.socket = new WebSocket('http://34.30.187.213:8080/ws');
 
     // 2. Enviar saludo o mensaje inicial
     this.socket.onopen = () => {
