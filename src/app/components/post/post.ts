@@ -32,6 +32,7 @@ export class Post implements OnInit{
         console.log('Post enviado exitosamente:', response);
         
         console.log(this.sistema.EnviarImagen(this.selectedFile))
+        console.log("PRuebaPRuebaPRuebaPRuebaPRuebaPRueba")
         this.socket.send(this.newPost);
         this.newPost = ''; // Limpiar el campo de entrada después de enviar
       },

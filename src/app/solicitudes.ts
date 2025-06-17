@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 export class Solicitudes {
   private http = inject(HttpClient);
 
-  private readonly BACKEND_URL = 'http://34.46.243.239:8080';
+  private readonly BACKEND_URL = 'http://34.46.243.239:5001';
+  private readonly FILE_SERVER_URL = 'http://35.226.229.196:7000';
 
   constructor() {}
 
@@ -23,7 +24,7 @@ export class Solicitudes {
     const formData = new FormData();
     formData.append('imagen', selectedFile);
 
-    return this.http.post(`${this.BACKEND_URL}/subir-imagen`, formData);
+    return this.http.post(`${this.FILE_SERVER_URL}/subir-imagen`, formData);
   }
 
   /**
