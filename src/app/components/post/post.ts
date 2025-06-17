@@ -25,42 +25,42 @@ export class Post implements OnInit{
     }
   }
   
-  submitPost() {
-    if(this.selectedFile){
-      this.sistema.EnviarCorreo({ contenedor: this.newPost, imagen:this.nombre}).subscribe(
-      (response: any) => {
-        console.log('Post enviado exitosamente:', response);
-        
-        console.log(this.sistema.EnviarImagen(this.selectedFile))
-        console.log("PRuebaPRuebaPRuebaPRuebaPRuebaPRueba")
-        this.socket.send(this.newPost);
-        this.newPost = ''; // Limpiar el campo de entrada después de enviar
+submitPost() {
+  if (this.selectedFile) {
+    // 1. Primero subir la imagen
+    this.sistema.EnviarImagen(this.selectedFile).subscribe({
+      next: (respuestaImagen) => {
+        console.log('✅ Imagen subida:', respuestaImagen);
+
+        // 2. Luego enviar el post con el nombre de imagen
+        const nombreImagen = this.selectedFile?.name;
+
+        this.sistema.EnviarCorreo({ contenedor: this.newPost, imagen: nombreImagen }).subscribe({
+          next: (respuestaPost) => {
+            console.log('✅ Post enviado:', respuestaPost);
+            this.socket.send(this.newPost);
+            this.newPost = '';
+          },
+          complete: () => this.dash()
+        });
       },
-      (error: any) => {
-        // Manejar error si es necesario
-      },
-      () => {
-        this.dash();
+      error: (error) => {
+        console.error('❌ Error al subir imagen:', error);
+        alert('Error al subir la imagen');
       }
-    );
-    }
-    else{
-      this.sistema.EnviarCorreo({ contenedor: this.newPost}).subscribe(
-      (response: any) => {
-        console.log('Post enviado exitosamente:', response);
+    });
+  } else {
+    // Si no hay imagen, solo envía el texto
+    this.sistema.EnviarCorreo({ contenedor: this.newPost }).subscribe({
+      next: (respuestaPost) => {
+        console.log('✅ Post sin imagen enviado:', respuestaPost);
         this.socket.send(this.newPost);
-        this.newPost = ''; // Limpiar el campo de entrada después de enviar
+        this.newPost = '';
       },
-      (error: any) => {
-        // Manejar error si es necesario
-      },
-      () => {
-        this.dash();
-      }
-    );
-    }
-      
+      complete: () => this.dash()
+    });
   }
+}
 
   
   constructor(private router: Router,private sistema: Solicitudes) {}
