@@ -22,7 +22,7 @@ export class Dashboard implements OnInit {
     this.cargarPosts();
 
     // 1. Conectar al WebSocket
-    this.socket = new WebSocket('http://34.30.187.213:8080/ws');
+    this.socket = new WebSocket('http://34.71.68.251:8080/ws');
 
     // 2. Enviar saludo o mensaje inicial
     this.socket.onopen = () => {

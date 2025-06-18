@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class Solicitudes {
   private http = inject(HttpClient);
 
-  private readonly BACKEND_URL = 'http://34.30.187.213:8080';
+  private readonly BACKEND_URL = 'http://34.71.68.251:8080';
   private readonly FILE_SERVER_URL = 'http://104.155.161.54:7000';
 
   constructor() {}
