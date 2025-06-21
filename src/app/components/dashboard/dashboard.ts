@@ -10,7 +10,7 @@ import { Solicitudes } from '../../solicitudes';
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
-  posts: { contenedor: string; id: number; imagen: string | null }[] = [];
+  posts: { contenedor: string; id: number}[] = [];
   private socket!: WebSocket;
 
   constructor(
@@ -20,20 +20,6 @@ export class Dashboard implements OnInit {
 
   ngOnInit(): void {
     this.cargarPosts();
-
-    // 1. Conectar al WebSocket
-    this.socket = new WebSocket('http://34.71.68.251:8080/ws');
-
-    // 2. Enviar saludo o mensaje inicial
-    this.socket.onopen = () => {
-      console.log("Conectado al WebSocket");
-      // this.socket.send("hola");
-    };
-
-    // 3. Escuchar mensajes del servidor
-    this.socket.onmessage = (msg) => {
-     this.cargarPosts()
-    };
   }
 
   cargarPosts() {

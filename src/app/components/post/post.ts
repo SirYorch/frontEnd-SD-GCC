@@ -11,7 +11,7 @@ import { Solicitudes } from '../../solicitudes';
   templateUrl: './post.html',
   styleUrl: './post.scss'
 })
-export class Post implements OnInit{
+export class Post{
   newPost = '';
   selectedFile: File | null = null;
   nombre: string | null = null;
@@ -26,57 +26,18 @@ export class Post implements OnInit{
   }
   
 submitPost() {
-  if (this.selectedFile) {
-    // 1. Primero subir la imagen
-    this.sistema.EnviarImagen(this.selectedFile).subscribe({
-      next: (respuestaImagen) => {
-        console.log('✅ Imagen subida:', respuestaImagen);
-
-        // 2. Luego enviar el post con el nombre de imagen
-        const nombreImagen = this.selectedFile?.name;
-
-        this.sistema.EnviarCorreo({ contenedor: this.newPost, imagen: nombreImagen }).subscribe({
-          next: (respuestaPost) => {
-            console.log('✅ Post enviado:', respuestaPost);
-            this.socket.send(this.newPost);
-            this.newPost = '';
-          },
-          complete: () => this.dash()
-        });
-      },
-      error: (error) => {
-        console.error(' Error al subir imagen:', error);
-        alert('Error al subir la imagen');
-      }
-    });
-  } else {
-    // Si no hay imagen, solo envía el texto
-    this.sistema.EnviarCorreo({ contenedor: this.newPost }).subscribe({
-      next: (respuestaPost) => {
-        console.log(' Post sin imagen enviado:', respuestaPost);
-        this.socket.send(this.newPost);
-        this.newPost = '';
-      },
-      complete: () => this.dash()
-    });
-  }
+  this.sistema.EnviarCorreo({ contenedor: this.newPost }).subscribe({
+    next: (respuestaPost) => {
+      console.log(' Post sin imagen enviado:', respuestaPost);
+      this.socket.send(this.newPost);
+      this.newPost = '';
+    },
+    complete: () => this.dash()
+  });
 }
 
   
   constructor(private router: Router,private sistema: Solicitudes) {}
-  ngOnInit(): void {
-    // 1. Conectar al WebSocket
-    this.socket = new WebSocket('http://34.71.68.251:8080/ws');
-
-    // 2. Enviar saludo o mensaje inicial
-    this.socket.onopen = () => {
-      console.log("Conectado al WebSocket");
-    };
-
-    
-
-  }
-  
 
   dash(){
     this.router.navigate(['/']);
