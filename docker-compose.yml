@@ -1,0 +1,32 @@
+services:
+    db:
+      image: postgres:15
+      container_name: postgres-db
+      environment:
+        POSTGRES_USER: usuario
+        POSTGRES_PASSWORD: clave
+        POSTGRES_DB: midb
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      ports:
+        - "5432:5432"
+
+    backend:
+        build: ./Backend
+        container_name: backend_py
+        ports: 
+          - "8765:8765"
+        environment:
+          PORT: 8765
+          DB_HOST: db
+          DB_PORT: 5432
+          DB_NAME: midb
+          DB_USER: usuario
+          DB_PASS: clave
+    frontend:
+        build: ./Frontend
+        container_name: frontend
+        ports:
+          - "80:80"
+volumes:
+  postgres_data:    

@@ -8,10 +8,9 @@ import { Observable } from 'rxjs';
 export class Solicitudes {
   private http = inject(HttpClient);
 
-  private readonly BACKEND_URL = 'http://192.168.1.102:5001';
-  
+  private readonly BACKEND_URL = 'http://localhost:8765';
 
-  constructor() {}
+  constructor() { }
   /**
    * Recupera todos los posts desde el backend (5001)
    */
