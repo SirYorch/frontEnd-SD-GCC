@@ -1,32 +1,92 @@
-services:
-    db:
-      image: postgres:15
-      container_name: postgres-db
-      environment:
-        POSTGRES_USER: usuario
-        POSTGRES_PASSWORD: clave
-        POSTGRES_DB: midb
-      volumes:
-        - postgres_data:/var/lib/postgresql/data
-      ports:
-        - "5432:5432"
+version: '3.8'
 
-    backend:
-        build: ./Backend
-        container_name: backend_py
-        ports: 
-          - "8765:8765"
-        environment:
-          PORT: 8765
-          DB_HOST: db
-          DB_PORT: 5432
-          DB_NAME: midb
-          DB_USER: usuario
-          DB_PASS: clave
-    frontend:
-        build: ./Frontend
-        container_name: frontend
-        ports:
-          - "80:80"
+services:
+  db_master:
+    image: postgres:15
+    container_name: postgres-master
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: clave
+      POSTGRES_DB: midb
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usuario"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db_slave:
+    image: postgres:15
+    container_name: postgres-slave
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: clave
+    depends_on:
+      - db_master
+    volumes:
+      - postgres_slave_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usuario"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend1:
+    build: ./Backend
+    container_name: backend1
+    environment:
+      PORT: 8765
+      DB_HOST: db_master
+      DB_PORT: 5432
+      DB_NAME: midb
+      DB_USER: usuario
+      DB_PASS: clave
+    expose:
+      - "8765"
+    depends_on:
+      db_master:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  backend2:
+    build: ./Backend
+    container_name: backend2
+    environment:
+      PORT: 8765
+      DB_HOST: db_master
+      DB_PORT: 5432
+      DB_NAME: midb
+      DB_USER: usuario
+      DB_PASS: clave
+    expose:
+      - "8765"
+    depends_on:
+      db_master:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  nginx:
+    build: ./Frontend
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+    depends_on:
+      backend1:
+        condition: service_healthy
+      backend2:
+        condition: service_healthy
+
 volumes:
-  postgres_data:    
+  postgres_master_data:
+  postgres_slave_data:

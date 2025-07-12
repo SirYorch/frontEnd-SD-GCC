@@ -4,7 +4,6 @@ import psycopg2
 import os
 import logging
 
-# Desactivar logs de Flask
 log = logging.getLogger('werkzeug')
 log.disabled = True
 logging.basicConfig(level=logging.CRITICAL)
@@ -14,8 +13,7 @@ app.logger.disabled = True
 
 CORS(app)
 
-# Configuración de conexión
-DB_HOST = os.getenv("DB_HOST", "db")
+DB_HOST = os.getenv("DB_HOST", "db_master")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "midb")
 DB_USER = os.getenv("DB_USER", "usuario")
@@ -103,6 +101,22 @@ def insertar_dato():
     except Exception as e:
         print("[ERROR en /insertar]:", e)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/health')
+def health():
+    try:
+        conn = psycopg2.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASS
+        )
+        conn.close()
+        return "OK", 200
+    except:
+        return "DB Unreachable", 500
 
 
 if __name__ == '__main__':
