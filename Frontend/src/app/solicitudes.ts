@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class Solicitudes {
   private http = inject(HttpClient);
 
-  private readonly BACKEND_URL = 'http://localhost:8765';
+  private readonly BACKEND_URL = '/api';
 
   constructor() { }
   /**
