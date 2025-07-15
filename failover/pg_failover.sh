@@ -1,35 +1,32 @@
 #!/bin/sh
+set -e
 
-MASTER_HOST="db_master"
-SLAVE_HOST="db_slave"
-PGUSER="replicador"
-PGPASSWORD="replipass"
-PGPORT=5432
-RETRIES=10
+echo ">>> Iniciando script de failover..."
 
-export PGPASSWORD="$PGPASSWORD"  
+# Esperar a que el master esté disponible inicialmente (por si se levanta lento)
+until pg_isready -h db_master -U usuario -d midb >/dev/null 2>&1; do
+  echo ">>> Esperando que db_master esté disponible..."
+  sleep 2
+done
 
-echo "[INFO] Iniciando monitoreo de failover..."
+echo ">>> Monitoreando estado del master..."
 
 while true; do
-  echo "[CHECK] Verificando estado del master..."
-  pg_isready -h "$MASTER_HOST" -p "$PGPORT" -U "$PGUSER"
-  if [ $? -ne 0 ]; then
-    echo "[FAILOVER] El master no responde. Intentando conectar al slave..."
+  if ! pg_isready -h db_master -U usuario -d midb >/dev/null 2>&1; then
+    echo ">>> db_master está CAÍDO, iniciando failover..."
 
-    for i in $(seq 1 $RETRIES); do
-      echo "[TRY] Conectando a $SLAVE_HOST (intento $i)..."
-      psql -h "$SLAVE_HOST" -U "$PGUSER" -d postgres -c "SELECT 1;" && break
-      sleep 2
-    done
+    # Promover el slave
+    docker exec -u postgres postgres-slave psql -U usuario -c "SELECT pg_promote();" -d midb
 
-    echo "[PROMOTE] Ejecutando promoción en el slave..."
-    psql -h "$SLAVE_HOST" -U "$PGUSER" -d postgres -c "SELECT pg_promote();"
+    # Conectar el slave a la red con alias `db`
+    docker network connect --alias db frontend-sd-gcc_default postgres-slave || echo "Ya conectado"
 
-    echo "[INFO] Promoción enviada al slave. Saliendo del monitoreo."
-    break
-  else
-    echo "[OK] Master activo. Próxima verificación en 10 segundos..."
+    # Reiniciar los backends para que se reconecten a `db` (ahora apuntando al slave)
+    docker restart backend1 backend2
+
+    echo ">>> Failover completo. Esperando para verificar de nuevo..."
+    sleep 3600  # evita promover varias veces innecesariamente
   fi
-  sleep 10
+
+  sleep 5
 done
