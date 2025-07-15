@@ -50,6 +50,7 @@ services:
     networks:
       frontend-sd-gcc_default:
         aliases:
+          - db
           - db_slave
 
   backend1:
