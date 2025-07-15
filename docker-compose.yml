@@ -24,9 +24,10 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      default:
+      frontend-sd-gcc_default:
         aliases:
           - db
+          - db_master
 
   db_slave:
     image: postgres:15
@@ -47,9 +48,9 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      default:
+      frontend-sd-gcc_default:
         aliases:
-          - db
+          - db_slave
 
   backend1:
     build: ./Backend
@@ -71,6 +72,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - frontend-sd-gcc_default
 
   backend2:
     build: ./Backend
@@ -92,6 +95,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - frontend-sd-gcc_default
 
   nginx:
     build: ./Frontend
@@ -103,14 +108,28 @@ services:
         condition: service_healthy
       backend2:
         condition: service_healthy
+    networks:
+      - frontend-sd-gcc_default
 
-  failover:
+  pgfailover:
     image: alpine:latest
     container_name: pg_failover
-    command: ["apk", "add", "--no-cache", "curl"]
-
-
+    volumes:
+      - ./failover/pg_failover.sh:/pg_failover.sh
+    command: ["/bin/sh", "-c", "apk add --no-cache curl postgresql-client && /pg_failover.sh"]
+    depends_on:
+      db_master:
+        condition: service_healthy
+      db_slave:
+        condition: service_healthy
+    networks:
+      - frontend-sd-gcc_default
+      
 
 volumes:
   postgres_master_data:
   postgres_slave_data:
+
+networks:
+  frontend-sd-gcc_default:
+    driver: bridge
