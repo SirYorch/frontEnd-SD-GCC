@@ -13,7 +13,7 @@ app.logger.disabled = True
 
 CORS(app)
 
-DB_HOST = os.getenv("DB_HOST", "db_master")
+DB_HOST = os.getenv("DB_HOST", "db")
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "midb")
 DB_USER = os.getenv("DB_USER", "usuario")

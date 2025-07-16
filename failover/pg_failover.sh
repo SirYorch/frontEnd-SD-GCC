@@ -21,9 +21,6 @@ while true; do
     # Conectar el slave a la red con alias `db`
     docker network connect --alias db frontend-sd-gcc_default postgres-slave || echo "Ya conectado"
 
-    # Reiniciar los backends para que se reconecten a `db` (ahora apuntando al slave)
-    docker restart backend1 backend2
-
     echo ">>> Failover completo. Esperando para verificar de nuevo..."
     sleep 3600  # evita promover varias veces innecesariamente
   fi
