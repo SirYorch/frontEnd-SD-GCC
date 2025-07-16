@@ -121,5 +121,5 @@ def health():
 
 if __name__ == '__main__':
     crear_tabla_si_no_existe()
-    PORT = int(os.getenv("PORT", 5001))
+    PORT = int(os.getenv("PORT", 8765))
     app.run(host="0.0.0.0", port=PORT)
