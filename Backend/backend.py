@@ -5,11 +5,11 @@ import os
 import logging
 
 log = logging.getLogger('werkzeug')
-log.disabled = True
+log.disabled = False
 logging.basicConfig(level=logging.CRITICAL)
 
 app = Flask(__name__)
-app.logger.disabled = True
+app.logger.disabled = False
 
 CORS(app)
 
